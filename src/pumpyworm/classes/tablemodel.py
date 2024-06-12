@@ -88,19 +88,8 @@ class TableModel(QAbstractTableModel):
     def clear_segments(self):   
         self._dataframe = pd.DataFrame(
             data= {
-                "Time": [],
-                "Start Conc.": [],
-                "End Conc.": []
+                "Time (min)": [],
+                "[Start] (mM)": [],
+                "[End] (mM)": []
         })
         self.layoutChanged.emit()
-    
-    #def headerData(self, section, orientation, role=Qt.DisplayRole):
-    #    if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-    #        if section == 0:
-    #            return "Time"
-    #        elif section == 1:
-    #            return "Start Conc."
-    #        elif section == 2:
-    #            return "End Conc."
-
- #       return super().headerData(section, orientation, role)

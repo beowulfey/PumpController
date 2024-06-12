@@ -340,7 +340,7 @@ class Ui_PumPyWorm(object):
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.widget_plots.sizePolicy().hasHeightForWidth())
         self.widget_plots.setSizePolicy(sizePolicy1)
-        self.widget_plots.setMinimumSize(QSize(100, 100))
+        self.widget_plots.setMinimumSize(QSize(100, 200))
 
         self.verticalLayout_2.addWidget(self.widget_plots)
 
