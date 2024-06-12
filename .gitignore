@@ -78,3 +78,6 @@ __pycache__/
 dist/
 Pipfile
 build/
+
+src/*.egg
+*.spec
