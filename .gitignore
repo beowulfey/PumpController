@@ -76,3 +76,4 @@ CMakeLists.txt.user*
 __pycache__/
 .ropeproject/
 dist/
+Pipfile
