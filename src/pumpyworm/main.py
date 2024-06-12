@@ -255,7 +255,7 @@ class PumPyWorm(QMainWindow):
         self.write_to_console(f"{datetime.strftime(datetime.now(), FMT)} Beginning protocol!")
         self.write_to_console(f"{datetime.strftime(datetime.now(), FMT)} Protocol is: [Time (min), Conc In (mM), Conc Out (mM)]")
         for i, seg in self.ui.table_segments.model().get_segments().iterrows():
-            self.write_to_console(f"{datetime.strftime(datetime.now(), FMT)} {seg['Time']}, {seg['Start Conc.']}, {seg['End Conc.']}")
+            self.write_to_console(f"{datetime.strftime(datetime.now(), FMT)} {seg['Time (min)']}, {seg['[Start] (mM)']}, {seg['[End] (mM)']}")
         if self.port:
             for n, pump in enumerate(self.pumps):
                 pump.send_program(self.phases[n])
@@ -334,17 +334,17 @@ class PumPyWorm(QMainWindow):
         for i, row in prog.iterrows():
             phase_a = {}
             phase_b = {}
-            if row["Start Conc."] == row["End Conc."]:
+            if row["[Start] (mM)"] == row["[End] (mM)"]:
                 # if this is a "RAT" (no change)
-                rates = self.calculate_flowrates(row["Start Conc."])
+                rates = self.calculate_flowrates(row["[Start] (mM)"])
                 
                 phase_a["type"] = "RAT"
                 phase_a["rate"] = rates[0]
-                phase_a["amt"] = float(row["Time"])
+                phase_a["amt"] = float(row["Time (min)"])
                 
                 phase_b["type"] = "RAT"
                 phase_b["rate"] = rates[1]
-                phase_b["amt"] = float(row["Time"])
+                phase_b["amt"] = float(row["Time (min)"])
 
                 phases_a.append(phase_a)
                 phases_b.append(phase_b)
@@ -352,8 +352,8 @@ class PumPyWorm(QMainWindow):
                 # if this is LIN, amounts are TIMES (minutes)
                 # Time values are placed either in the first or second segment depending on length
                 # First set is HR:MIN second is SEC:TENTHS
-                start_rates = self.calculate_flowrates(row["Start Conc."])
-                end_rates = self.calculate_flowrates(row["End Conc."])
+                start_rates = self.calculate_flowrates(row["[Start] (mM)"])
+                end_rates = self.calculate_flowrates(row["[End] (mM)"])
                 
                 phase_a["type"] = "LIN"
                 phase_b["type"] = "LIN"
@@ -369,14 +369,14 @@ class PumPyWorm(QMainWindow):
                 # Time is HH:MM or SS:10THS
                 
                 
-                if row["Time"] >= 1.0:
-                    time = str(int(row["Time"])).zfill(2)
+                if row["Time (min)"] >= 1.0:
+                    time = str(int(row["Time (min)"])).zfill(2)
                     phase_a["amt"] = f"00:{time}"
                     a_end["amt"] = "00:00"
                     phase_b["amt"] = f"00:{time}"
                     b_end["amt"] = "00:00"
-                elif row["Time"] < 1.0:
-                    time = str(int(row["Time"]*60)).zfill(2)
+                elif row["Time (min)"] < 1.0:
+                    time = str(int(row["Time (min)"]*60)).zfill(2)
                     phase_a["amt"] = "00:00"
                     phase_b["amt"] = "00:00"
                     a_end["amt"] = f"{time}:00"
