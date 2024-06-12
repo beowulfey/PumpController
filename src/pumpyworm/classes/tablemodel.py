@@ -6,9 +6,9 @@ class TableModel(QAbstractTableModel):
     def __init__(self, parent=None):
         QAbstractTableModel.__init__(self, parent)
         self._dataframe = pd.DataFrame(data= {
-            "Time": [],
-            "Start Conc.": [],
-            "End Conc.": []
+            "Time (min)": [],
+            "[Start] (mM)": [],
+            "[End] (mM)": []
         })
         
     def data(self, index: QModelIndex, role=Qt.ItemDataRole):

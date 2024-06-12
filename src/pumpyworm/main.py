@@ -3,7 +3,7 @@ from datetime import datetime
 from serial.tools import list_ports
 
 from PySide6.QtCore import QTimer
-from PySide6.QtWidgets import QMainWindow
+from PySide6.QtWidgets import QMainWindow, QHeaderView
 from PySide6.QtGui import QAction, QColor, QTextCursor, QColorConstants
 
     
@@ -41,7 +41,10 @@ class PumPyWorm(QMainWindow):
         self.pumps = None
 
         model = TableModel()
+    
         self.ui.table_segments.setModel(model)
+        #self.ui.table.horizontalHeader().setCascadingSectionResizes(True)
+        self.ui.table_segments.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.phases = []
         
         self.protocol = Protocol()
@@ -94,7 +97,7 @@ class PumPyWorm(QMainWindow):
         menu_file = menubar.addMenu('&File')
         menu_file.addAction(act_exit)
         menu_file.addAction(act_save_log)
-        menu_file.addAction(act_reset_pumps)
+        #menu_file.addAction(act_reset_pumps)
 
 
         # Link signals to slots
@@ -312,7 +315,7 @@ class PumPyWorm(QMainWindow):
             self.update_pump_program()
             self.protocol.generate(self.ui.table_segments.model().get_segments())
             self.ui.widget_plots.on_change(self.protocol)
-            self.ui.table_segments.resizeColumnsToContents()
+            #self.ui.table_segments.resizeColumnsToContents()
     
     def clear_segments(self):
         self.ui.table_segments.model().clear_segments()

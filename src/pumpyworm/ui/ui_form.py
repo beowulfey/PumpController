@@ -18,10 +18,10 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QTransform)
 from PySide6.QtWidgets import (QAbstractItemView, QAbstractScrollArea, QAbstractSpinBox, QApplication,
     QComboBox, QDoubleSpinBox, QFrame, QGridLayout,
-    QHBoxLayout, QHeaderView, QLabel, QMainWindow,
-    QPushButton, QSizePolicy, QSpacerItem, QSpinBox,
-    QStatusBar, QTableView, QTextEdit, QVBoxLayout,
-    QWidget)
+    QHBoxLayout, QHeaderView, QLabel, QLayout,
+    QMainWindow, QPushButton, QSizePolicy, QSpacerItem,
+    QSpinBox, QStatusBar, QTableView, QTextEdit,
+    QVBoxLayout, QWidget)
 
 from pumpyworm.classes.plotwidget import PlotWidget
 
@@ -39,9 +39,19 @@ class Ui_PumPyWorm(object):
         self.centralwidget.setFont(font)
         self.gridLayout = QGridLayout(self.centralwidget)
         self.gridLayout.setObjectName(u"gridLayout")
+        self.verticalSpacer_5 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.gridLayout.addItem(self.verticalSpacer_5, 0, 1, 1, 1)
+
+        self.frame_2 = QFrame(self.centralwidget)
+        self.frame_2.setObjectName(u"frame_2")
+        self.frame_2.setFrameShape(QFrame.StyledPanel)
+        self.frame_2.setFrameShadow(QFrame.Raised)
+        self.gridLayout_5 = QGridLayout(self.frame_2)
+        self.gridLayout_5.setObjectName(u"gridLayout_5")
         self.verticalLayout_5 = QVBoxLayout()
         self.verticalLayout_5.setObjectName(u"verticalLayout_5")
-        self.frame_4 = QFrame(self.centralwidget)
+        self.frame_4 = QFrame(self.frame_2)
         self.frame_4.setObjectName(u"frame_4")
         self.frame_4.setFrameShape(QFrame.StyledPanel)
         self.frame_4.setFrameShadow(QFrame.Raised)
@@ -127,22 +137,11 @@ class Ui_PumPyWorm(object):
 
         self.verticalLayout_5.addWidget(self.frame_4)
 
-        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
-
-        self.verticalLayout_5.addItem(self.verticalSpacer)
-
-        self.line = QFrame(self.centralwidget)
-        self.line.setObjectName(u"line")
-        self.line.setFrameShape(QFrame.Shape.HLine)
-        self.line.setFrameShadow(QFrame.Shadow.Sunken)
-
-        self.verticalLayout_5.addWidget(self.line)
-
         self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.verticalLayout_5.addItem(self.verticalSpacer_2)
 
-        self.frame = QFrame(self.centralwidget)
+        self.frame = QFrame(self.frame_2)
         self.frame.setObjectName(u"frame")
         self.frame.setFrameShape(QFrame.StyledPanel)
         self.frame.setFrameShadow(QFrame.Raised)
@@ -193,55 +192,44 @@ class Ui_PumPyWorm(object):
         self.verticalLayout_5.addWidget(self.frame)
 
 
-        self.gridLayout.addLayout(self.verticalLayout_5, 0, 0, 1, 1)
+        self.gridLayout_5.addLayout(self.verticalLayout_5, 0, 0, 1, 1)
+
+
+        self.gridLayout.addWidget(self.frame_2, 1, 1, 1, 1)
+
+        self.verticalSpacer_7 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.gridLayout.addItem(self.verticalSpacer_7, 3, 1, 1, 1)
+
+        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.gridLayout.addItem(self.horizontalSpacer_2, 1, 3, 1, 1)
+
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.gridLayout.addItem(self.horizontalSpacer, 1, 0, 1, 1)
 
         self.frame_3 = QFrame(self.centralwidget)
         self.frame_3.setObjectName(u"frame_3")
         self.frame_3.setFrameShape(QFrame.StyledPanel)
         self.frame_3.setFrameShadow(QFrame.Raised)
-        self.verticalLayout_6 = QVBoxLayout(self.frame_3)
-        self.verticalLayout_6.setObjectName(u"verticalLayout_6")
-        self.horizontalLayout_6 = QHBoxLayout()
-        self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
+        self.verticalLayout_2 = QVBoxLayout(self.frame_3)
+        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.horizontalLayout_4 = QHBoxLayout()
+        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
+        self.horizontalLayout_4.setSizeConstraint(QLayout.SetMinimumSize)
         self.gridLayout_4 = QGridLayout()
         self.gridLayout_4.setObjectName(u"gridLayout_4")
         self.label_15 = QLabel(self.frame_3)
         self.label_15.setObjectName(u"label_15")
 
-        self.gridLayout_4.addWidget(self.label_15, 1, 0, 1, 1)
-
-        self.label_16 = QLabel(self.frame_3)
-        self.label_16.setObjectName(u"label_16")
-
-        self.gridLayout_4.addWidget(self.label_16, 3, 0, 1, 1)
-
-        self.label_17 = QLabel(self.frame_3)
-        self.label_17.setObjectName(u"label_17")
-
-        self.gridLayout_4.addWidget(self.label_17, 2, 0, 1, 1)
+        self.gridLayout_4.addWidget(self.label_15, 3, 0, 1, 1)
 
         self.spin_start_conc = QSpinBox(self.frame_3)
         self.spin_start_conc.setObjectName(u"spin_start_conc")
         self.spin_start_conc.setSingleStep(10)
 
-        self.gridLayout_4.addWidget(self.spin_start_conc, 2, 1, 1, 1)
-
-        self.but_clear_segments = QPushButton(self.frame_3)
-        self.but_clear_segments.setObjectName(u"but_clear_segments")
-
-        self.gridLayout_4.addWidget(self.but_clear_segments, 4, 1, 1, 1)
-
-        self.label_18 = QLabel(self.frame_3)
-        self.label_18.setObjectName(u"label_18")
-        self.label_18.setFont(font1)
-
-        self.gridLayout_4.addWidget(self.label_18, 0, 0, 1, 2)
-
-        self.spin_end_conc = QSpinBox(self.frame_3)
-        self.spin_end_conc.setObjectName(u"spin_end_conc")
-        self.spin_end_conc.setSingleStep(10)
-
-        self.gridLayout_4.addWidget(self.spin_end_conc, 3, 1, 1, 1)
+        self.gridLayout_4.addWidget(self.spin_start_conc, 4, 1, 1, 1)
 
         self.spin_seg_time = QDoubleSpinBox(self.frame_3)
         self.spin_seg_time.setObjectName(u"spin_seg_time")
@@ -249,18 +237,65 @@ class Ui_PumPyWorm(object):
         self.spin_seg_time.setSingleStep(0.050000000000000)
         self.spin_seg_time.setStepType(QAbstractSpinBox.DefaultStepType)
 
-        self.gridLayout_4.addWidget(self.spin_seg_time, 1, 1, 1, 1)
+        self.gridLayout_4.addWidget(self.spin_seg_time, 3, 1, 1, 1)
+
+        self.line = QFrame(self.frame_3)
+        self.line.setObjectName(u"line")
+        self.line.setFrameShape(QFrame.Shape.HLine)
+        self.line.setFrameShadow(QFrame.Shadow.Sunken)
+
+        self.gridLayout_4.addWidget(self.line, 1, 0, 1, 2)
+
+        self.label_17 = QLabel(self.frame_3)
+        self.label_17.setObjectName(u"label_17")
+
+        self.gridLayout_4.addWidget(self.label_17, 4, 0, 1, 1)
+
+        self.label_16 = QLabel(self.frame_3)
+        self.label_16.setObjectName(u"label_16")
+
+        self.gridLayout_4.addWidget(self.label_16, 5, 0, 1, 1)
+
+        self.but_clear_segments = QPushButton(self.frame_3)
+        self.but_clear_segments.setObjectName(u"but_clear_segments")
+
+        self.gridLayout_4.addWidget(self.but_clear_segments, 6, 1, 1, 1)
 
         self.but_add_segment = QPushButton(self.frame_3)
         self.but_add_segment.setObjectName(u"but_add_segment")
 
-        self.gridLayout_4.addWidget(self.but_add_segment, 4, 0, 1, 1)
+        self.gridLayout_4.addWidget(self.but_add_segment, 6, 0, 1, 1)
+
+        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.gridLayout_4.addItem(self.verticalSpacer, 0, 0, 1, 1)
+
+        self.label_18 = QLabel(self.frame_3)
+        self.label_18.setObjectName(u"label_18")
+        self.label_18.setFont(font1)
+
+        self.gridLayout_4.addWidget(self.label_18, 2, 0, 1, 2)
+
+        self.spin_end_conc = QSpinBox(self.frame_3)
+        self.spin_end_conc.setObjectName(u"spin_end_conc")
+        self.spin_end_conc.setSingleStep(10)
+
+        self.gridLayout_4.addWidget(self.spin_end_conc, 5, 1, 1, 1)
+
+        self.line_2 = QFrame(self.frame_3)
+        self.line_2.setObjectName(u"line_2")
+        self.line_2.setFrameShape(QFrame.Shape.HLine)
+        self.line_2.setFrameShadow(QFrame.Shadow.Sunken)
+
+        self.gridLayout_4.addWidget(self.line_2, 7, 0, 1, 2)
 
 
-        self.horizontalLayout_6.addLayout(self.gridLayout_4)
+        self.horizontalLayout_4.addLayout(self.gridLayout_4)
 
-        self.horizontalLayout_7 = QHBoxLayout()
-        self.horizontalLayout_7.setObjectName(u"horizontalLayout_7")
+        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_4.addItem(self.horizontalSpacer_3)
+
         self.verticalLayout_7 = QVBoxLayout()
         self.verticalLayout_7.setObjectName(u"verticalLayout_7")
         self.label_19 = QLabel(self.frame_3)
@@ -271,7 +306,7 @@ class Ui_PumPyWorm(object):
 
         self.table_segments = QTableView(self.frame_3)
         self.table_segments.setObjectName(u"table_segments")
-        sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.table_segments.sizePolicy().hasHeightForWidth())
@@ -287,29 +322,27 @@ class Ui_PumPyWorm(object):
 
         self.verticalLayout_7.setStretch(1, 1)
 
-        self.horizontalLayout_7.addLayout(self.verticalLayout_7)
+        self.horizontalLayout_4.addLayout(self.verticalLayout_7)
 
 
-        self.horizontalLayout_6.addLayout(self.horizontalLayout_7)
-
-
-        self.verticalLayout_6.addLayout(self.horizontalLayout_6)
-
-        self.verticalSpacer_3 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
-
-        self.verticalLayout_6.addItem(self.verticalSpacer_3)
+        self.verticalLayout_2.addLayout(self.horizontalLayout_4)
 
         self.label_20 = QLabel(self.frame_3)
         self.label_20.setObjectName(u"label_20")
         self.label_20.setFont(font1)
 
-        self.verticalLayout_6.addWidget(self.label_20)
+        self.verticalLayout_2.addWidget(self.label_20)
 
         self.widget_plots = PlotWidget(self.frame_3)
         self.widget_plots.setObjectName(u"widget_plots")
-        self.widget_plots.setMinimumSize(QSize(300, 200))
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.widget_plots.sizePolicy().hasHeightForWidth())
+        self.widget_plots.setSizePolicy(sizePolicy1)
+        self.widget_plots.setMinimumSize(QSize(100, 100))
 
-        self.verticalLayout_6.addWidget(self.widget_plots)
+        self.verticalLayout_2.addWidget(self.widget_plots)
 
         self.horizontalLayout_3 = QHBoxLayout()
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
@@ -324,14 +357,10 @@ class Ui_PumPyWorm(object):
         self.horizontalLayout_3.addWidget(self.but_stop_protocol)
 
 
-        self.verticalLayout_6.addLayout(self.horizontalLayout_3)
+        self.verticalLayout_2.addLayout(self.horizontalLayout_3)
 
 
-        self.gridLayout.addWidget(self.frame_3, 0, 2, 1, 1)
-
-        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-
-        self.gridLayout.addItem(self.horizontalSpacer, 0, 1, 1, 1)
+        self.gridLayout.addWidget(self.frame_3, 1, 2, 1, 1)
 
         self.console = QTextEdit(self.centralwidget)
         self.console.setObjectName(u"console")
@@ -339,11 +368,7 @@ class Ui_PumPyWorm(object):
         self.console.setUndoRedoEnabled(False)
         self.console.setReadOnly(True)
 
-        self.gridLayout.addWidget(self.console, 1, 0, 1, 3)
-
-        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-
-        self.gridLayout.addItem(self.horizontalSpacer_2, 0, 3, 1, 1)
+        self.gridLayout.addWidget(self.console, 2, 1, 1, 2)
 
         PumPyWorm.setCentralWidget(self.centralwidget)
         self.statusBar = QStatusBar(PumPyWorm)
@@ -365,7 +390,6 @@ class Ui_PumPyWorm(object):
         QWidget.setTabOrder(self.but_clear_segments, self.table_segments)
         QWidget.setTabOrder(self.table_segments, self.but_start_protocol)
         QWidget.setTabOrder(self.but_start_protocol, self.but_stop_protocol)
-        QWidget.setTabOrder(self.but_stop_protocol, self.console)
 
         self.retranslateUi(PumPyWorm)
 
@@ -388,11 +412,11 @@ class Ui_PumPyWorm(object):
         self.label_10.setText(QCoreApplication.translate("PumPyWorm", u"Concentration", None))
         self.label_11.setText(QCoreApplication.translate("PumPyWorm", u"Straight Run", None))
         self.label_15.setText(QCoreApplication.translate("PumPyWorm", u"Time (min)", None))
-        self.label_16.setText(QCoreApplication.translate("PumPyWorm", u"End Conc (mM)", None))
         self.label_17.setText(QCoreApplication.translate("PumPyWorm", u"Start Conc (mM)", None))
+        self.label_16.setText(QCoreApplication.translate("PumPyWorm", u"End Conc (mM)", None))
         self.but_clear_segments.setText(QCoreApplication.translate("PumPyWorm", u"Clear All", None))
-        self.label_18.setText(QCoreApplication.translate("PumPyWorm", u"Add Segment", None))
         self.but_add_segment.setText(QCoreApplication.translate("PumPyWorm", u"Add Segment", None))
+        self.label_18.setText(QCoreApplication.translate("PumPyWorm", u"Add Segment", None))
         self.label_19.setText(QCoreApplication.translate("PumPyWorm", u"Current Segments", None))
         self.label_20.setText(QCoreApplication.translate("PumPyWorm", u"Current protocol", None))
         self.but_start_protocol.setText(QCoreApplication.translate("PumPyWorm", u"Start", None))

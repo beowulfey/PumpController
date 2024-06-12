@@ -1,0 +1,16 @@
+Metadata-Version: 2.1
+Name: PumPyWorm
+Version: 1.0.0
+Summary: A pump controller program for C. elegans microfluidics.
+Author-email: Aaron Wolfe <wolfe.aarond@gmail.com>
+Project-URL: Homepage, https://github.com/beowulfey/pumpyworm
+Project-URL: Issues, https://github.com/beowulfey/pumpyworm/issues
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: GPL-3
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+# PumPyWorm
+Pump controller program for flowing salt buffers to C. elegans
