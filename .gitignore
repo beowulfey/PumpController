@@ -79,5 +79,5 @@ dist/
 Pipfile
 build/
 
-src/*.egg
+src/*.egg*
 *.spec
