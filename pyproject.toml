@@ -1,0 +1,22 @@
+[project]
+name = "PumPyWorm"
+version = "1.0.0"
+authors = [
+    { name="Aaron Wolfe", email="wolfe.aarond@gmail.com" },
+]
+description = "A pump controller program for C. elegans microfluidics."
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GPL-3",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/beowulfey/pumpyworm"
+Issues = "https://github.com/beowulfey/pumpyworm/issues"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
