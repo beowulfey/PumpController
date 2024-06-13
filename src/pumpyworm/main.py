@@ -116,6 +116,7 @@ class PumPyWorm(QMainWindow):
         self.int_timer.timeout.connect(self.timer_tick)
         
         self.ui.table_segments.resizeColumnsToContents()
+        self.ui.spin_straight_conc.valueChanged.connect(self.enable_update)
 
 
     ## SLOTS
@@ -143,17 +144,17 @@ class PumPyWorm(QMainWindow):
         self.ui.but_confirm_settings.setStyleSheet('QPushButton { color: green;}')
         self.ui.but_confirm_settings.setText("Confirmed")
         self.ui.spin_straight_conc.setEnabled(True)
-        self.ui.but_start_pump.setEnabled(True)
+        #self.ui.but_start_pump.setEnabled(True)
         self.ui.but_update_pump.setEnabled(True)
-        self.ui.but_stop_pump.setEnabled(True)
+        #self.ui.but_stop_pump.setEnabled(True)
         self.ui.spin_seg_time.setEnabled(True)
         self.ui.spin_start_conc.setEnabled(True)
         self.ui.spin_end_conc.setEnabled(True)
         self.ui.but_add_segment.setEnabled(True)
         self.ui.but_clear_segments.setEnabled(True)
         self.ui.table_segments.setEnabled(True)
-        self.ui.but_start_protocol.setEnabled(True)
-        self.ui.but_stop_protocol.setEnabled(True)
+        #self.ui.but_start_protocol.setEnabled(True)
+        #self.ui.but_stop_protocol.setEnabled(True)
         self.ui.but_confirm_settings.setDisabled(True)
         self.ui.spin_start_conc.setMaximum(max(self.ui.spin_pac.value(), self.ui.spin_pbc.value()))
         self.ui.spin_end_conc.setMaximum(max(self.ui.spin_pac.value(), self.ui.spin_pbc.value()))
@@ -187,6 +188,20 @@ class PumPyWorm(QMainWindow):
         for pump in self.pumps:
             pump.reset()
     
+    def update_pump(self, rates=None):
+        if not rates:
+            rates = self.calculate_flowrates(self.ui.spin_straight_conc.value())
+        self.write_to_console(f"{datetime.strftime(datetime.now(), FMT)} Pump flow rates are now at {rates} (ml/min)")
+        
+        if self.port:
+            for _n, _pump in enumerate(self.pumps):
+                #_pump.send_run(phases[_n])
+                if rates[_n] > 0:
+                    _pump.send_run()
+                    _pump.pumping_rate = float(rates[_n])
+        self.ui.but_start_pump.setEnabled(True)
+        self.ui.but_update_pump.setDisabled(True)
+    
     def start_pump(self):
         self.write_to_console(f"{datetime.strftime(datetime.now(), FMT)} PUMP START SIGNAL! Running at {self.ui.spin_straight_conc.value()} mM concentration", GREEN)
         concs = self.calculate_flowrates(self.ui.spin_straight_conc.value())
@@ -194,11 +209,16 @@ class PumPyWorm(QMainWindow):
         
         if self.port:
             for _n, _pump in enumerate(self.pumps):
-                if concs[_n] > 0:
-                    if _pump.running:
+                if _pump.running:
                         _pump.stop()
-                        self.update_pump(concs)
-                    _pump.run(wait_while_running=False)
+                if concs[_n] > 0:
+                        _pump.send_run()
+                        _pump.pumping_rate = float(concs[_n])
+                        _pump.run(wait_while_running=False)
+        self.ui.but_stop_pump.setEnabled(True)
+        self.ui.but_start_pump.setDisabled(True)
+        #self.ui.but_start_protocol.setDisabled(True)
+        #self.ui.but_stop_protocol.setDisabled(True)
         
     
     def stop_pump(self):
@@ -212,33 +232,24 @@ class PumPyWorm(QMainWindow):
                 for pump in self.pumps:
                     if pump.running:
                         pump.stop()
-                    
+        self.ui.but_stop_pump.setDisabled(True)
+        self.ui.but_start_pump.setEnabled(True)
+        self.ui.but_update_pump.setEnabled(True)
+        #self.ui.but_start_protocol.setEnabled(True)
+        #self.ui.but_stop_protocol.setDisabled(True)
                 
-    def update_pump(self, rates=None):
-        if not rates:
-            rates = self.calculate_flowrates(self.ui.spin_straight_conc.value())
-        self.write_to_console(f"{datetime.strftime(datetime.now(), FMT)} Pump flow rates are now at {rates} (ml/min)")
-        
-        #phase_a = [{
-        #    "type": "RAT",
-        #    "rate": rates[0],
-        #    "amt": 0
-        #}] if rates[0] > 0 else []
-        #phase_b = [{
-        #    "type": "RAT",
-        #    "rate": rates[1],
-        #    "amt": 0
-        #}] if rates[1] > 0 else []
-        #phases = [phase_a, phase_b]
-        #print(phases)
-        
+    
+    def enable_update(self):
         if self.port:
-            for _n, _pump in enumerate(self.pumps):
-                #_pump.send_run(phases[_n])
-                if rates[_n] > 0:
-                    _pump.send_run()
-                    _pump.pumping_rate = float(rates[_n])
-                    
+            if (self.pumps[0].running or self.pumps[1].running) == False:
+                self.ui.but_update_pump.setEnabled(True)       
+                self.ui.but_start_pump.setDisabled(True)
+                self.ui.but_stop_pump.setDisabled(True)
+        else:
+            self.ui.but_update_pump.setEnabled(True)       
+            self.ui.but_start_pump.setDisabled(True)
+            self.ui.but_stop_pump.setDisabled(True)
+                
 
     
     def save_log(self):
@@ -246,7 +257,6 @@ class PumPyWorm(QMainWindow):
             yourFile.write(str(self.ui.console.toPlainText()))
             
     def start_protocol(self):
-        
         total_time = len(self.protocol.xvals())
         self.run_timer.start(total_time*1000)
         self.int_timer.start(self.protocol.dt()*1000)
@@ -256,10 +266,16 @@ class PumPyWorm(QMainWindow):
         self.write_to_console(f"{datetime.strftime(datetime.now(), FMT)} Protocol is: [Time (min), Conc In (mM), Conc Out (mM)]")
         for i, seg in self.ui.table_segments.model().get_segments().iterrows():
             self.write_to_console(f"{datetime.strftime(datetime.now(), FMT)} {seg['Time (min)']}, {seg['[Start] (mM)']}, {seg['[End] (mM)']}")
+        self.ui.but_start_protocol.setDisabled(True)
+        self.ui.but_stop_protocol.setEnabled(True)
+        self.ui.but_start_pump.setDisabled(True)
         if self.port:
             for n, pump in enumerate(self.pumps):
-                #pump.send_program(self.phases[n])
-                pump.run()
+                # Need this?
+                #if pump.running:
+                #        pump.stop()
+                pump.volume_infused_clear()
+                pump.run(phase=2)
     
     def timer_tick(self):
         if self.run_timer.isActive():
@@ -301,7 +317,8 @@ class PumPyWorm(QMainWindow):
             self.ui.widget_plots.set_x(0)
             self.write_to_console(f"#########################################################################################################")
             self.ui.but_start_pump.setEnabled(True)
-            self.ui.but_stop_pump.setEnabled(True)
+            self.ui.but_start_protocol.setEnabled(True)
+            #self.ui.but_stop_pump.setEnabled(True)
             self.ui.but_update_pump.setEnabled(True)
             
             
@@ -315,12 +332,19 @@ class PumPyWorm(QMainWindow):
             self.update_pump_program()
             self.protocol.generate(self.ui.table_segments.model().get_segments())
             self.ui.widget_plots.on_change(self.protocol)
+            if self.port:
+                if (self.pumps[0].running or self.pumps[1].running) == False:
+                    self.ui.but_start_protocol.setEnabled(True)
+            else:
+                self.ui.but_start_protocol.setEnabled(True)
             #self.ui.table_segments.resizeColumnsToContents()
     
     def clear_segments(self):
         self.ui.table_segments.model().clear_segments()
         self.protocol.generate(self.ui.table_segments.model().get_segments())
         self.ui.widget_plots.on_change(self.protocol)
+        self.ui.but_start_protocol.setDisabled(True)
+        self.ui.but_stop_protocol.setDisabled(True)
         
     
     def update_pump_program(self):

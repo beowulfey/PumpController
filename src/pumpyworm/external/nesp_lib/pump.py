@@ -305,16 +305,10 @@ class Pump :
         # It erases the network addresses too! 
         self.__command_transceive(Pump.__CommandName.RESET)
     
-    def send_run (self, wait_while_running : bool = True) -> None :
-        print("SEND RUN!!!")
-        self.__command_transceive(Pump.__CommandName.PHASE, [2])
-        self.wait_while_running()
-        self.__command_transceive(Pump.__CommandName.FUNC, [Pump.__CommandName.STOP.value])
-        self.wait_while_running()
+    def send_run (self, wait_while_running : bool = False) -> None :
         self.__command_transceive(Pump.__CommandName.PHASE, [1])
-        self.wait_while_running()
         self.__command_transceive(Pump.__CommandName.FUNC, [Pump.__CommandName.PUMPING_RATE.value])
-        self.wait_while_running()
+        self.__command_transceive(Pump.__CommandName.PUMPING_DIRECTION, [Pump.__PumpingDirectionInfuse])
             
             
     def send_program(self, prog : list , wait_while_running : bool = True) -> None : 
@@ -322,8 +316,9 @@ class Pump :
         # This command converts a list of program steps into phases on the pump
         if prog != []:
             for n, phase in enumerate(prog):
-                # program offset. #1 is base run, #2 is STOP, #3 is beginning of programs. 
-                n = n + 1
+                # program offset. #1 is base run, #3 is beginning of programs. 
+                # add 1 to convert from index-0, add 1 to skip past the first phase (continuous run)
+                n = n + 1 + 2
                 offset = 0
                 self.__command_transceive(Pump.__CommandName.PHASE, [n+offset])
                 
@@ -348,7 +343,7 @@ class Pump :
                         self.__command_transceive(Pump.__CommandName.FUNC, [Pump.__CommandName.PUMPING_RATE.value])
                         self.__command_transceive(Pump.__CommandName.PUMPING_RATE, [phase["rate"], self.__units])
                         self.__command_transceive(Pump.__CommandName.PUMPING_VOLUME, [vol])
-                        self.__command_transceive(Pump.__CommandName.PUMPING_DIRECTION, [Pump.__PumpingDirectionInfuse])
+                        
                 else:
                     # if phase is LIN
                     self.__command_transceive(Pump.__CommandName.FUNC, [Pump.__CommandName.LINEAR.value])
@@ -361,8 +356,8 @@ class Pump :
             self.wait_while_running()
             #self.__command_transceive(Pump.__CommandName.PHASE, [1])
     
-    def run(self, wait_while_running : bool = False) -> None :
-        self.__command_transceive(Pump.__CommandName.RUN, )
+    def run(self, phase : int = [1], wait_while_running : bool = False) -> None :
+        self.__command_transceive(Pump.__CommandName.RUN, [phase])
         if wait_while_running :
             self.wait_while_running()
     
