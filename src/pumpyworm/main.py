@@ -274,7 +274,7 @@ class PumPyWorm(QMainWindow):
                 # Need this?
                 #if pump.running:
                 #        pump.stop()
-                pump.volume_infused_clear()
+               # pump.volume_infused_clear()
                 pump.run(phase=2)
     
     def timer_tick(self):
@@ -299,6 +299,7 @@ class PumPyWorm(QMainWindow):
                 self.ui.but_start_pump.setEnabled(True)
                 self.ui.but_stop_pump.setEnabled(True)
                 self.ui.but_update_pump.setEnabled(True)
+                self.ui.but_start_protocol.setEnabled(True)
 
             else:
                 # If run ain't complete, keep going. 

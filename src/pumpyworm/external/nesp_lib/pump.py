@@ -315,10 +315,11 @@ class Pump :
         print(f"SEND PROGRAM TO PUMP {self.address}")
         # This command converts a list of program steps into phases on the pump
         if prog != []:
+            count = 0
             for n, phase in enumerate(prog):
                 # program offset. #1 is base run, #3 is beginning of programs. 
                 # add 1 to convert from index-0, add 1 to skip past the first phase (continuous run)
-                n = n + 1 + 2
+                n = n + 1 + 1
                 offset = 0
                 self.__command_transceive(Pump.__CommandName.PHASE, [n+offset])
                 
@@ -343,6 +344,7 @@ class Pump :
                         self.__command_transceive(Pump.__CommandName.FUNC, [Pump.__CommandName.PUMPING_RATE.value])
                         self.__command_transceive(Pump.__CommandName.PUMPING_RATE, [phase["rate"], self.__units])
                         self.__command_transceive(Pump.__CommandName.PUMPING_VOLUME, [vol])
+                        self.__command_transceive(Pump.__CommandName.PUMPING_DIRECTION, [Pump.__PumpingDirectionInfuse])
                         
                 else:
                     # if phase is LIN
@@ -350,13 +352,14 @@ class Pump :
                     self.__command_transceive(Pump.__CommandName.PUMPING_RATE, [phase["rate"], self.__units])
                     self.__command_transceive(Pump.__CommandName.TIME, phase["amt"])
                     self.__command_transceive(Pump.__CommandName.PUMPING_DIRECTION, [Pump.__PumpingDirectionInfuse])
-            self.__command_transceive(Pump.__CommandName.PHASE, [len(prog)+1])
+                count = n + 1 + 1 + offset
+            self.__command_transceive(Pump.__CommandName.PHASE, [count+1])
             self.__command_transceive(Pump.__CommandName.FUNC, [Pump.__CommandName.STOP.value])
         if wait_while_running :
             self.wait_while_running()
             #self.__command_transceive(Pump.__CommandName.PHASE, [1])
     
-    def run(self, phase : int = [1], wait_while_running : bool = False) -> None :
+    def run(self, phase : int = 1, wait_while_running : bool = False) -> None :
         self.__command_transceive(Pump.__CommandName.RUN, [phase])
         if wait_while_running :
             self.wait_while_running()
