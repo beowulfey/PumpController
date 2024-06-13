@@ -258,7 +258,7 @@ class PumPyWorm(QMainWindow):
             self.write_to_console(f"{datetime.strftime(datetime.now(), FMT)} {seg['Time (min)']}, {seg['[Start] (mM)']}, {seg['[End] (mM)']}")
         if self.port:
             for n, pump in enumerate(self.pumps):
-                pump.send_program(self.phases[n])
+                #pump.send_program(self.phases[n])
                 pump.run()
     
     def timer_tick(self):
