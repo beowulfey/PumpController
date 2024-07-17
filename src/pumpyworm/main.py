@@ -19,9 +19,11 @@ from pumpyworm.constants import FMT, RED, GREEN
 #     pyside6-uic form.ui -o ui_form.py
 
 
-# TO DO
+###### TO DO
 # ADD UPDATE PROTOCOL BUTTON
 # CAN'T SEND PROTOCOL WHILE PUMP IS RUNNING!! 
+
+# ADD ABOUT WHICH SHOWS THE SOFTWARE VERSION
 
 
 class PumPyWorm(QMainWindow):
@@ -29,7 +31,7 @@ class PumPyWorm(QMainWindow):
         super().__init__(parent)
         self.ui = Ui_PumPyWorm()
         self.ui.setupUi(self)
-        self.setWindowTitle('PumPy Worm')
+        self.setWindowTitle('Pump Control')
         #self.ui.console.setTextInteractionFlags(TextSelectableByKeyboard | TextSelectableByMouse)
 
         ## INITIATE PUMP SETTINGS
