@@ -8,11 +8,11 @@ from PySide6.QtGui import QAction, QColor, QTextCursor, QColorConstants
 
     
 
-from pumpyworm.external import nesp_lib
-from pumpyworm.classes.tablemodel import TableModel
-from pumpyworm.classes.protocol import Protocol
-from pumpyworm.ui.ui_form import Ui_PumPyWorm
-from pumpyworm.constants import FMT, RED, GREEN
+from pumpcontroller.external import nesp_lib
+from pumpcontroller.classes.tablemodel import TableModel
+from pumpcontroller.classes.protocol import Protocol
+from pumpcontroller.ui.ui_form import Ui_PumpController
+from pumpcontroller.constants import FMT, RED, GREEN
 
 # Important:
 # Run the following command to generate the ui_form.py file in the UI directory
@@ -26,10 +26,10 @@ from pumpyworm.constants import FMT, RED, GREEN
 # ADD ABOUT WHICH SHOWS THE SOFTWARE VERSION
 
 
-class PumPyWorm(QMainWindow):
+class PumpController(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.ui = Ui_PumPyWorm()
+        self.ui = Ui_PumpController()
         self.ui.setupUi(self)
         self.setWindowTitle('Pump Control')
         #self.ui.console.setTextInteractionFlags(TextSelectableByKeyboard | TextSelectableByMouse)

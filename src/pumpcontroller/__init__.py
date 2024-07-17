@@ -3,16 +3,16 @@ import sys
 from PySide6.QtWidgets import QApplication
 import qdarktheme
 
-from pumpyworm.main import PumPyWorm
+from pumpcontroller.main import PumpController
 
 
-__VERSION__ = "1.0.1"
+__VERSION__ = "1.2.0"
 
 def app():
     #QApplication.setStyle("fusion")
     app = QApplication(sys.argv)
     qdarktheme.setup_theme("light")
-    widget = PumPyWorm()
+    widget = PumpController()
     widget.show()
     sys.exit(app.exec())
 

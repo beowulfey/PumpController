@@ -23,9 +23,9 @@ from PySide6.QtWidgets import (QAbstractItemView, QAbstractScrollArea, QAbstract
     QSpinBox, QStatusBar, QTableView, QTextEdit,
     QVBoxLayout, QWidget)
 
-from pumpyworm.classes.plotwidget import PlotWidget
+from pumpcontroller.classes.plotwidget import PlotWidget
 
-class Ui_PumPyWorm(object):
+class Ui_PumpController(object):
     def setupUi(self, PumPyWorm):
         if not PumPyWorm.objectName():
             PumPyWorm.setObjectName(u"PumPyWorm")
@@ -397,29 +397,29 @@ class Ui_PumPyWorm(object):
     # setupUi
 
     def retranslateUi(self, PumPyWorm):
-        PumPyWorm.setWindowTitle(QCoreApplication.translate("PumPyWorm", u"AWpumps", None))
-        self.actionQuit.setText(QCoreApplication.translate("PumPyWorm", u"Quit", None))
-        self.label_6.setText(QCoreApplication.translate("PumPyWorm", u"Pump B Syringe Conc (mM)", None))
-        self.label_7.setText(QCoreApplication.translate("PumPyWorm", u"Pump Settings", None))
-        self.label_5.setText(QCoreApplication.translate("PumPyWorm", u"Pump A Syringe Conc (mM)", None))
-        self.but_confirm_settings.setText(QCoreApplication.translate("PumPyWorm", u"Confirm", None))
-        self.label_2.setText(QCoreApplication.translate("PumPyWorm", u"Refresh Rate (sec)", None))
-        self.label.setText(QCoreApplication.translate("PumPyWorm", u"COM Port:", None))
-        self.label_4.setText(QCoreApplication.translate("PumPyWorm", u"Flow Rate (ml/min)", None))
-        self.but_start_pump.setText(QCoreApplication.translate("PumPyWorm", u"Start", None))
-        self.but_update_pump.setText(QCoreApplication.translate("PumPyWorm", u"Update", None))
-        self.but_stop_pump.setText(QCoreApplication.translate("PumPyWorm", u"Stop", None))
-        self.label_10.setText(QCoreApplication.translate("PumPyWorm", u"Concentration", None))
-        self.label_11.setText(QCoreApplication.translate("PumPyWorm", u"Straight Run", None))
-        self.label_15.setText(QCoreApplication.translate("PumPyWorm", u"Time (min)", None))
-        self.label_17.setText(QCoreApplication.translate("PumPyWorm", u"Start Conc (mM)", None))
-        self.label_16.setText(QCoreApplication.translate("PumPyWorm", u"End Conc (mM)", None))
-        self.but_clear_segments.setText(QCoreApplication.translate("PumPyWorm", u"Clear All", None))
-        self.but_add_segment.setText(QCoreApplication.translate("PumPyWorm", u"Add Segment", None))
-        self.label_18.setText(QCoreApplication.translate("PumPyWorm", u"Add Segment", None))
-        self.label_19.setText(QCoreApplication.translate("PumPyWorm", u"Current Segments", None))
-        self.label_20.setText(QCoreApplication.translate("PumPyWorm", u"Current protocol", None))
-        self.but_start_protocol.setText(QCoreApplication.translate("PumPyWorm", u"Start", None))
-        self.but_stop_protocol.setText(QCoreApplication.translate("PumPyWorm", u"Stop", None))
+        PumPyWorm.setWindowTitle(QCoreApplication.translate("PumpController", u"AWpumps", None))
+        self.actionQuit.setText(QCoreApplication.translate("PumpController", u"Quit", None))
+        self.label_6.setText(QCoreApplication.translate("PumpController", u"Pump B Syringe Conc (mM)", None))
+        self.label_7.setText(QCoreApplication.translate("PumpController", u"Pump Settings", None))
+        self.label_5.setText(QCoreApplication.translate("PumpController", u"Pump A Syringe Conc (mM)", None))
+        self.but_confirm_settings.setText(QCoreApplication.translate("PumpController", u"Confirm", None))
+        self.label_2.setText(QCoreApplication.translate("PumpController", u"Refresh Rate (sec)", None))
+        self.label.setText(QCoreApplication.translate("PumpController", u"COM Port:", None))
+        self.label_4.setText(QCoreApplication.translate("PumpController", u"Flow Rate (ml/min)", None))
+        self.but_start_pump.setText(QCoreApplication.translate("PumpController", u"Start", None))
+        self.but_update_pump.setText(QCoreApplication.translate("PumpController", u"Update", None))
+        self.but_stop_pump.setText(QCoreApplication.translate("PumpController", u"Stop", None))
+        self.label_10.setText(QCoreApplication.translate("PumpController", u"Concentration", None))
+        self.label_11.setText(QCoreApplication.translate("PumpController", u"Straight Run", None))
+        self.label_15.setText(QCoreApplication.translate("PumpController", u"Time (min)", None))
+        self.label_17.setText(QCoreApplication.translate("PumpController", u"Start Conc (mM)", None))
+        self.label_16.setText(QCoreApplication.translate("PumpController", u"End Conc (mM)", None))
+        self.but_clear_segments.setText(QCoreApplication.translate("PumpController", u"Clear All", None))
+        self.but_add_segment.setText(QCoreApplication.translate("PumpController", u"Add Segment", None))
+        self.label_18.setText(QCoreApplication.translate("PumpController", u"Add Segment", None))
+        self.label_19.setText(QCoreApplication.translate("PumpController", u"Current Segments", None))
+        self.label_20.setText(QCoreApplication.translate("PumpController", u"Current protocol", None))
+        self.but_start_protocol.setText(QCoreApplication.translate("PumpController", u"Start", None))
+        self.but_stop_protocol.setText(QCoreApplication.translate("PumpController", u"Stop", None))
     # retranslateUi
 

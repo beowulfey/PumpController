@@ -1,3 +1,3 @@
-from pumpyworm import app
+from pumpcontroller import app
 
 app()
