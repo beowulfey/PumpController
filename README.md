@@ -1,4 +1,4 @@
-# PumPyWorm
+# Pump Controller
 Pump controller program for flowing salt buffers to C. elegans. Build upon a modified version of Florian Lapp's nesp-lib library. 
 
 This is a GUI-based program for controlling two New Era NE-1000X syringe pumps. I wrote it with the expectation that the two pumps contain buffers with different salt concentrations; these two channels are then combined in line with a static mixer to a chosen concentration. It lets a user easily input protocols consisting of different concentration holds and linear gradients. 
@@ -23,17 +23,17 @@ I haven't really made this user friendly yet -- still need to update setup.py an
 
 > pip install build pyinstaller  
 > python -m build  
-> pip install dist/PumpPyWorm-1.0.1-py3-none-any.whl  
+> pip install dist/PumpController-1.2.0-py3-none-any.whl  
 
 3. You can now run the program by running:
 
-> python PumPyWorm.py
+> python PumpController.py
 
 4. As an optional "make it more user friendly" step, use PyInstaller to make it a bit more portable: 
 
-> pyinstaller PumPyWorm.py
+> pyinstaller PumpController.py
 
-This will create an .EXE in dist/PumPyWorm. You can create a shortcut to this on the desktop or somewhere else. 
+This will create an .EXE in dist/PumpController. You can create a shortcut to this on the desktop or somewhere else. 
 
 
 

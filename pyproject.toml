@@ -1,6 +1,6 @@
 [project]
-name = "PumPyWorm"
-version = "1.1.2"
+name = "Pump Controller"
+version = "1.2.0"
 authors = [
     { name="Aaron Wolfe", email="wolfe.aarond@gmail.com" },
 ]
