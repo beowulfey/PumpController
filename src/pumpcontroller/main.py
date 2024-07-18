@@ -2,8 +2,8 @@
 from datetime import datetime
 from serial.tools import list_ports
 
-from PySide6.QtCore import QTimer
-from PySide6.QtWidgets import QMainWindow, QHeaderView
+from PySide6.QtCore import Qt, QTimer
+from PySide6.QtWidgets import QMainWindow, QHeaderView, QAbstractItemView
 from PySide6.QtGui import QAction, QColor, QTextCursor, QColorConstants
 
     
@@ -49,8 +49,22 @@ class PumpController(QMainWindow):
         model = TableModel()
     
         self.ui.table_segments.setModel(model)
+        
+        self.ui.table_segments.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.ui.table_segments.setSelectionBehavior(QAbstractItemView.SelectRows)
+        #self.ui.table_segments.setDragEnabled(True)
+        #self.ui.table_segments.setAcceptDrops(True)
+        #self.ui.table_segments.setDragDropMode(QAbstractItemView.DragDrop)
+        #self.ui.table_segments.setDefaultDropAction(Qt.MoveAction)
+        #self.ui.table_segments.setDragDropOverwriteMode(False)
+        #self.ui.table_segments.setDropIndicatorShown(True)
+        
         #self.ui.table.horizontalHeader().setCascadingSectionResizes(True)
         self.ui.table_segments.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.ui.table_segments.horizontalHeader().setHighlightSections(False)
+        self.ui.table_segments.verticalHeader().setHighlightSections(False)
+        #self.ui.table_segments.verticalHeader().setVisible(False)
+        
         self.phases = []
         
         self.protocol = Protocol()
@@ -81,6 +95,7 @@ class PumpController(QMainWindow):
         self.ui.table_segments.setDisabled(True)
         self.ui.but_start_protocol.setDisabled(True)
         self.ui.but_stop_protocol.setDisabled(True)
+        self.ui.but_update_protocol.setDisabled(True)
 
 
         # Create exit action with icon, shortcut, status tip and close window click event
@@ -120,8 +135,12 @@ class PumpController(QMainWindow):
         self.ui.but_start_protocol.clicked.connect(self.start_protocol)
         self.ui.but_stop_protocol.clicked.connect(self.stop_protocol)
         self.int_timer.timeout.connect(self.timer_tick)
+        self.ui.but_update_protocol.clicked.connect(self.update_protocol)
+        
         
         self.ui.table_segments.resizeColumnsToContents()
+        self.ui.but_delete_segment.clicked.connect(self.rm_segment)
+        
         #self.ui.spin_straight_conc.valueChanged.connect(self.enable_update)
 
 
@@ -145,6 +164,7 @@ class PumpController(QMainWindow):
         self.ui.table_segments.setDisabled(True)
         self.ui.but_start_protocol.setDisabled(True)
         self.ui.but_stop_protocol.setDisabled(True)
+        self.ui.but_update_protocol.setDisabled(True)
 
     def confirm_settings(self):
         self.write_to_console(f"{datetime.strftime(datetime.now(), FMT)} PUMP SETTINGS CONFIRMED:", color=GREEN)
@@ -163,6 +183,7 @@ class PumpController(QMainWindow):
         self.ui.table_segments.setEnabled(True)
         self.ui.but_start_protocol.setEnabled(True)
         self.ui.but_stop_protocol.setEnabled(True)
+        self.ui.but_update_protocol.setEnabled(True)
         self.ui.but_confirm_settings.setDisabled(True)
         self.ui.spin_start_conc.setMaximum(max(self.ui.spin_pac.value(), self.ui.spin_pbc.value()))
         self.ui.spin_end_conc.setMaximum(max(self.ui.spin_pac.value(), self.ui.spin_pbc.value()))
@@ -265,25 +286,27 @@ class PumpController(QMainWindow):
             yourFile.write(str(self.ui.console.toPlainText()))
             
     def start_protocol(self):
-        total_time = len(self.protocol.xvals())
-        self.run_timer.start(total_time*1000)
-        self.int_timer.start(self.protocol.dt()*1000)
-        print("Total Time\t\tTime Left\t\tIndex\t\tSeconds")
-        self.write_to_console(f"#########################################################################################################")
-        self.write_to_console(f"{datetime.strftime(datetime.now(), FMT)} Beginning protocol!")
-        self.write_to_console(f"{datetime.strftime(datetime.now(), FMT)} Protocol is: [Time (min), Conc In (mM), Conc Out (mM)]")
-        for i, seg in self.ui.table_segments.model().get_segments().iterrows():
-            self.write_to_console(f"{datetime.strftime(datetime.now(), FMT)} {seg['Time (min)']}, {seg['[Start] (mM)']}, {seg['[End] (mM)']}")
-        #self.ui.but_start_protocol.setDisabled(True)
-        #self.ui.but_stop_protocol.setEnabled(True)
-        #self.ui.but_start_pump.setDisabled(True)
-        if self.port:
-            for n, pump in enumerate(self.pumps):
-                # Need this?
-                #if pump.running:
-                #        pump.stop()
-               # pump.volume_infused_clear()
-                pump.run(phase=2)
+        if len(self.ui.table_segments.model().get_segments()) > 0:
+            total_time = len(self.protocol.xvals())
+            self.run_timer.start(total_time*1000)
+            self.int_timer.start(self.protocol.dt()*1000)
+            print("Total Time\t\tTime Left\t\tIndex\t\tSeconds")
+            self.write_to_console(f"#########################################################################################################")
+            self.write_to_console(f"{datetime.strftime(datetime.now(), FMT)} Beginning protocol!")
+            self.write_to_console(f"{datetime.strftime(datetime.now(), FMT)} Protocol is: [Time (min), Conc In (mM), Conc Out (mM)]")
+            for i, seg in self.ui.table_segments.model().get_segments().iterrows():
+                self.write_to_console(f"{datetime.strftime(datetime.now(), FMT)} {seg['Time (min)']}, {seg['[Start] (mM)']}, {seg['[End] (mM)']}")
+            #self.ui.but_start_protocol.setDisabled(True)
+            #self.ui.but_stop_protocol.setEnabled(True)
+            #self.ui.but_start_pump.setDisabled(True)
+            if self.port:
+                for n, pump in enumerate(self.pumps):
+                    # Need this?
+                    #if pump.running:
+                    #        pump.stop()
+                    pump.run(phase=2)
+        else:
+            self.write_to_console(f"{datetime.strftime(datetime.now(), FMT)} @@@@@ HEY DON'T START AN EMPTY PROTOCOL YOU SILLY GOOSE @@@@@", RED)
     
     def timer_tick(self):
         if self.run_timer.isActive():
@@ -330,8 +353,14 @@ class PumpController(QMainWindow):
             #self.ui.but_stop_pump.setEnabled(True)
             #self.ui.but_update_pump.setEnabled(True)
             
-            
-    
+    def rm_segment(self):
+        if self.ui.table_segments.selectionModel().selectedRows() != None:
+            print(self.ui.table_segments.selectionModel().selectedRows()[0].row())
+            self.ui.table_segments.model().rm_segment(self.ui.table_segments.selectionModel().selectedRows()[0].row())
+            self.update_pump_program()
+            self.protocol.generate(self.ui.table_segments.model().get_segments())
+            self.ui.widget_plots.on_change(self.protocol)
+        
     def add_segment(self):
         if self.ui.spin_seg_time.value() > 0:
             self.ui.table_segments.model().add_segment([self.ui.spin_seg_time.value(), self.ui.spin_start_conc.value(), self.ui.spin_end_conc.value()])
@@ -355,7 +384,12 @@ class PumpController(QMainWindow):
         #self.ui.but_start_protocol.setDisabled(True)
         #self.ui.but_stop_protocol.setDisabled(True)
         
-    
+    def update_protocol(self):
+        self.write_to_console(f"{datetime.strftime(datetime.now(), FMT)} SENT PROTOCOL TO PUMP")
+        if self.port:
+            for n, pump in enumerate(self.pumps):
+                pump.send_program(self.phases[n])
+                
     def update_pump_program(self):
         # converts the segments into phase format for the pumps
         # either RAT (rate) or LIN (linear ramp)

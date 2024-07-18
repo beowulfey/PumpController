@@ -81,6 +81,15 @@ class TableModel(QAbstractTableModel):
     def add_segment(self, seg):
         self._dataframe.loc[len(self._dataframe)] = seg
         self.layoutChanged.emit()
+        
+    def rm_segment(self, pos=-1):
+        if pos == -1: 
+            self._dataframe.drop(self._dataframe.tail(1).index, inplace=True)
+        else:
+            self._dataframe.drop([pos], axis=0, inplace=True)
+        self._dataframe.reset_index(drop=True, inplace=True)
+        self.layoutChanged.emit()
+        
     
     def get_segments(self):
         return self._dataframe    
