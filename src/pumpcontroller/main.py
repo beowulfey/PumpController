@@ -128,6 +128,8 @@ class PumpController(QMainWindow):
     ## SLOTS
 
     def settings_changed(self):
+        self.port = None
+        self.pumps = None
         self.ui.but_confirm_settings.setEnabled(True)
         self.ui.but_confirm_settings.setStyleSheet('QPushButton { color: black;}')
         self.ui.but_confirm_settings.setText("Confirm")

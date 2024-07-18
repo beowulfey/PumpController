@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>PumpController</class>
+ <class>PumPyWorm</class>
  <widget class="QMainWindow" name="PumPyWorm">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>926</width>
-    <height>602</height>
+    <height>651</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -493,6 +493,13 @@
           <widget class="QPushButton" name="but_start_protocol">
            <property name="text">
             <string>Start</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="but_update_protocol">
+           <property name="text">
+            <string>Update</string>
            </property>
           </widget>
          </item>
