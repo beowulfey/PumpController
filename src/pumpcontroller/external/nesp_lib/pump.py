@@ -11,6 +11,10 @@ import time
 import enum
 import threading
 
+# I apologize to any future reader of this code. I've never used this form of Python, have never used Typing, enums, etc. 
+# Lots of new "skills" here I had to learn. It's probably butchered and ugly. 
+# --AW
+
 class Pump :
     """Pump."""
 
@@ -84,7 +88,7 @@ class Pump :
         
         # There is no command to just set units, so we want to save this data in pythonland
         # I've set it to ml/min by default
-        # This is not at all how the original author set up this software but WHO CARES
+        # This is not at all how the original author set up this software but OH WELL
         self.__units = "MM" 
 
     @property

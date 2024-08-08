@@ -1,6 +1,8 @@
 # This Python file uses the following encoding: utf-8
 from datetime import datetime
 from serial.tools import list_ports
+import serial
+import time
 
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWidgets import QMainWindow, QHeaderView, QAbstractItemView
@@ -11,6 +13,7 @@ from PySide6.QtGui import QAction, QColor, QTextCursor, QColorConstants
 from pumpcontroller.external import nesp_lib
 from pumpcontroller.classes.tablemodel import TableModel
 from pumpcontroller.classes.protocol import Protocol
+from pumpcontroller.classes.conductivity import Meter
 from pumpcontroller.ui.ui_form import Ui_PumpController
 from pumpcontroller.constants import FMT, RED, GREEN
 
@@ -35,8 +38,8 @@ class PumpController(QMainWindow):
         #self.ui.console.setTextInteractionFlags(TextSelectableByKeyboard | TextSelectableByMouse)
 
         ## INITIATE PUMP SETTINGS
-        self.ui.combo_com.addItem("None")
-        self.ui.combo_com.addItems([str(_port).split(" ")[0] for _port in list_ports.comports()])
+        #self.ui.combo_com.addItem("None")
+        #self.ui.combo_com.addItems([str(_port).split(" ")[0] for _port in list_ports.comports()])
         self.ui.spin_flow_rate.setValue(0.4)
         self.ui.spin_pac.setValue(0)
         self.ui.spin_pbc.setValue(100)
@@ -45,6 +48,7 @@ class PumpController(QMainWindow):
         
         self.port = None
         self.pumps = None
+        
 
         model = TableModel()
     
@@ -68,13 +72,16 @@ class PumpController(QMainWindow):
         self.phases = []
         
         self.protocol = Protocol()
-        
+        self.record_cond = False
         
         self.run_timer = QTimer()
         self.run_timer.setSingleShot(True)
         
         self.int_timer = QTimer()
         self.int_timer.setSingleShot(True)
+        
+        self.cond_timer = QTimer()
+        self.cond_timer.setSingleShot(False)
         
         offset = max(self.ui.spin_pac.value(), self.ui.spin_pbc.value()) * 0.10
         self.ui.widget_plots.set_yax(min(self.ui.spin_pac.value(), self.ui.spin_pbc.value())-offset,max(self.ui.spin_pac.value(), self.ui.spin_pbc.value())+offset)
@@ -122,10 +129,11 @@ class PumpController(QMainWindow):
 
 
         # Link signals to slots
-        self.ui.combo_com.currentIndexChanged.connect(self.settings_changed)
+        #self.ui.combo_com.currentIndexChanged.connect(self.settings_changed)
         self.ui.spin_flow_rate.valueChanged.connect(self.settings_changed)
         self.ui.spin_pac.valueChanged.connect(self.settings_changed)
         self.ui.spin_pbc.valueChanged.connect(self.settings_changed)
+        #self.ui.spin_refresh.valueChanged.connect(self.settings_changed)
         self.ui.but_confirm_settings.clicked.connect(self.confirm_settings)
         self.ui.but_start_pump.clicked.connect(self.start_pump)
         self.ui.but_stop_pump.clicked.connect(self.stop_pump)
@@ -135,11 +143,17 @@ class PumpController(QMainWindow):
         self.ui.but_start_protocol.clicked.connect(self.start_protocol)
         self.ui.but_stop_protocol.clicked.connect(self.stop_protocol)
         self.int_timer.timeout.connect(self.timer_tick)
+        self.cond_timer.timeout.connect(self.cond_timer_tick)
         self.ui.but_update_protocol.clicked.connect(self.update_protocol)
-        
         
         self.ui.table_segments.resizeColumnsToContents()
         self.ui.but_delete_segment.clicked.connect(self.rm_segment)
+        
+        self.ui.but_set_cond_min.clicked.connect(self.set_cond_min)
+        self.ui.but_set_cond_max.clicked.connect(self.set_cond_max)
+        self.ui.but_reset_cond.clicked.connect(self.reset_cond)
+        
+        
         
         #self.ui.spin_straight_conc.valueChanged.connect(self.enable_update)
 
@@ -165,10 +179,12 @@ class PumpController(QMainWindow):
         self.ui.but_start_protocol.setDisabled(True)
         self.ui.but_stop_protocol.setDisabled(True)
         self.ui.but_update_protocol.setDisabled(True)
+        self.cond_timer.stop()
+        self.record_cond=False
 
     def confirm_settings(self):
         self.write_to_console(f"{datetime.strftime(datetime.now(), FMT)} PUMP SETTINGS CONFIRMED:", color=GREEN)
-        self.write_to_console(f"{datetime.strftime(datetime.now(), FMT)} Refresh rate: {self.ui.spin_refresh.value()}; Flow Rate: {self.ui.spin_flow_rate.value()}; PAC: {self.ui.spin_pac.value()}; PBC: {self.ui.spin_pbc.value()}", color=GREEN)
+        #self.write_to_console(f"{datetime.strftime(datetime.now(), FMT)} Refresh rate: {self.ui.spin_refresh.value()}; Flow Rate: {self.ui.spin_flow_rate.value()}; PAC: {self.ui.spin_pac.value()}; PBC: {self.ui.spin_pbc.value()}", color=GREEN)
         self.ui.but_confirm_settings.setStyleSheet('QPushButton { color: green;}')
         self.ui.but_confirm_settings.setText("Confirmed")
         self.ui.spin_straight_conc.setEnabled(True)
@@ -187,26 +203,41 @@ class PumpController(QMainWindow):
         self.ui.but_confirm_settings.setDisabled(True)
         self.ui.spin_start_conc.setMaximum(max(self.ui.spin_pac.value(), self.ui.spin_pbc.value()))
         self.ui.spin_end_conc.setMaximum(max(self.ui.spin_pac.value(), self.ui.spin_pbc.value()))
-        self.protocol.set_dt(self.ui.spin_refresh.value())
+        self.protocol.set_dt(1)#self.ui.spin_refresh.value())
         self.ui.spin_straight_conc.setMaximum(max(self.ui.spin_pac.value(), self.ui.spin_pbc.value()))
         self.ui.spin_seg_time.setMaximum(30)
         offset = max(self.ui.spin_pac.value(), self.ui.spin_pbc.value()) * 0.10
         self.ui.widget_plots.set_yax(min(self.ui.spin_pac.value(), self.ui.spin_pbc.value())-offset,max(self.ui.spin_pac.value(), self.ui.spin_pbc.value())+offset)
-
-        
+        self.ui.widget_plot_cond.clear_axes()
+        self.cond_timer.start(1000)
+        self.record_cond = True
         
         try:
-            self.port = nesp_lib.Port(self.ui.combo_com.currentText(), 19200)
+            self.port = nesp_lib.Port(None, 19200)
             self.pumps = [nesp_lib.Pump(self.port, address=0), nesp_lib.Pump(self.port, address=1)]
+
         except:
             self.port = None
             self.pumps = None
             self.write_to_console(f"{datetime.strftime(datetime.now(), FMT)} @@@@@ Unable to connect to pumps! Operating in test mode @@@@@", RED)
         else:
             self.write_to_console(f"{datetime.strftime(datetime.now(), FMT)} @@@@@ PUMP CONNECTED AT COM PORT {self.ui.combo_com.currentText()} @@@@@", GREEN)
+            
+        try:
+            self.meter_port = serial.Serial('/dev/tty.usbserial-2130',9600)
+            self.meter = Meter(self.meter_port)
+            
+        except:
+            self.meter = Meter()
+            self.write_to_console(f"{datetime.strftime(datetime.now(), FMT)} @@@@@ Unable to connect to CONDUCTIVITY METER! Operating in test mode @@@@@", RED)
+        else:
+            self.write_to_console(f"{datetime.strftime(datetime.now(), FMT)} @@@@@ METER CONNECTED AT COM PORT @@@@@", GREEN)
+        
+        
+        self.ui.label_cond_units.setText(self.meter.units)
+            
     
     def write_to_console(self, text, color=QColor(QColorConstants.Black).name()):
-        
         text = f'<span style=\"white-space: pre-wrap; color: {color}\">{text}</span><br>'
         self.ui.console.moveCursor(QTextCursor.End)
         self.ui.console.insertHtml(text)
@@ -261,25 +292,32 @@ class PumpController(QMainWindow):
                 for pump in self.pumps:
                     if pump.running:
                         pump.stop()
-        #self.ui.but_stop_pump.setDisabled(True)
-        #self.ui.but_start_pump.setEnabled(True)
-        #self.ui.but_update_pump.setEnabled(True)
-        #self.ui.but_start_protocol.setEnabled(True)
-        #self.ui.but_stop_protocol.setDisabled(True)
-                
+                        
+    def cond_timer_tick(self):
+        #start = time.time()
+        if self.meter.port != None:
+            reading = self.meter.read()
+            #self.write_to_console(f"READ {reading} in {time.time()-start}")
+            self.ui.label_cond.setText(reading[1][0])
+            self.ui.label_cond_units.setText(reading[1][1])
+        
+    def set_cond_min(self):
+        last = float(self.ui.label_cond.text())
+        self.meter.set_min(last)
     
-    #def enable_update(self):
-    #    if self.port:
-    #        if (self.pumps[0].running or self.pumps[1].running) == False:
-    #            self.ui.but_update_pump.setEnabled(True)       
-    #            self.ui.but_start_pump.setDisabled(True)
-    #            self.ui.but_stop_pump.setDisabled(True)
-    #    else:
-    #        self.ui.but_update_pump.setEnabled(True)       
-    #        self.ui.but_start_pump.setDisabled(True)
-    #        self.ui.but_stop_pump.setDisabled(True)
+    def set_cond_max(self):
+        last = float(self.ui.label_cond.text())
+        self.meter.set_max(last)
+        
+    def reset_cond(self):
+        self.meter.reset()
+    
                 
-
+    def record_cond(self):
+        """ Begin recording the conductivity data to memory."""
+        start = time.time()
+        reading = self.meter.read()
+        self.write_to_console(f"READ {reading} in {time.time()-start}")
     
     def save_log(self):
         with open(f"./logs/{datetime.today()}_run.md", 'w') as yourFile:

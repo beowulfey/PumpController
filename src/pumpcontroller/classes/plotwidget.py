@@ -16,22 +16,17 @@ class PlotWidget(QWidget):
         self.view = FigureCanvas(Figure(figsize=(4, 2)))
         self.axes = self.view.figure.subplots()
         self._x = 0
-        #self.toolbar = NavigationToolbar2QT(self.view, self)
-
         
         #  Create layout
         vlayout = QVBoxLayout()
-        #vlayout.addWidget(self.toolbar)
         vlayout.addWidget(self.view)
         self.setLayout(vlayout)
 
-        # connect inputs with on_change method
-        #self.mu_input.valueChanged.connect(self.on_change)
-        #self.std_input.valueChanged.connect(self.on_change)
-        self.protocol = None
+        self.data = None
         self.ybot = 0
         self.ytop = 100
         self.on_change()
+        
        
 
     def set_x(self, currx):
@@ -45,22 +40,27 @@ class PlotWidget(QWidget):
         
     def x(self):
         return self._x
+    
+    def clear_axes(self):
+        self.axes.clear()
+        self.axes.set_ylabel("")
+        self.axes.set_xlabel("")
 
     @Slot()
-    def set_protocol(self, prot):
-        self.protocol = prot
+    def set_data(self, prot):
+        self.data = prot
 
     @Slot()
-    def on_change(self, protocol=None):
+    def on_change(self, data=None):
         """ Update the plot with the current input values """
 
-        if protocol is not None:
-            self.set_protocol(protocol)
+        if data is not None:
+            self.set_data(data)
         
         
-        if self.protocol is not None:
-            x = self.protocol.xvals()
-            y = self.protocol.yvals()
+        if self.data is not None:
+            x = self.data.xvals()
+            y = self.data.yvals()
         else:
             x = []
             y = []
