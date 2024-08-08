@@ -700,7 +700,7 @@ class Pump :
         if safe_mode_receive is None :
             safe_mode_receive = safe_mode_transmit
         with self.__port_lock :
-            print(f"TRANSMIT: {self.__address} {name.value} {[r for r in arguments]}")
+            print(f"PUMP TRANSMIT: {self.__address} {name.value} {[r for r in arguments]}")
             reply = Pump.__command_transceive_port(
                 self.__port,
                 safe_mode_transmit,
