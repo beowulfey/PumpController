@@ -144,6 +144,11 @@ class Ui_PumpController(object):
 
         self.gridLayout_2.addWidget(self.spin_flow_rate, 2, 1, 1, 1)
 
+        self.but_set_coms = QPushButton(self.frame_2)
+        self.but_set_coms.setObjectName(u"but_set_coms")
+
+        self.gridLayout_2.addWidget(self.but_set_coms, 5, 0, 1, 1)
+
 
         self.gridLayout_5.addLayout(self.gridLayout_2, 0, 0, 1, 1)
 
@@ -425,6 +430,7 @@ class Ui_PumpController(object):
         self.but_confirm_settings.setText(QCoreApplication.translate("PumpController", u"Confirm", None))
         self.label_6.setText(QCoreApplication.translate("PumpController", u"Pump B Syringe Conc (mM)", None))
         self.label_4.setText(QCoreApplication.translate("PumpController", u"Flow Rate (ml/min)", None))
+        self.but_set_coms.setText(QCoreApplication.translate("PumpController", u"Set COM ports", None))
         self.but_reset_cond.setText(QCoreApplication.translate("PumpController", u"Reset", None))
         self.but_set_cond_min.setText(QCoreApplication.translate("PumpController", u"Set Min", None))
         self.label_3.setText(QCoreApplication.translate("PumpController", u"Concentration Monitor", None))
