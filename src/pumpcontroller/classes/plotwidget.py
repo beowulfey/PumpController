@@ -31,7 +31,9 @@ class PlotWidget(QWidget):
         self.axes.set_ylabel("Conc (mM)",fontsize="9" )
         self.axes.set_xlabel("Time (min)", fontsize="9")
         plt.rcParams.update({'font.size': 9})
+        plt.rcParams["figure.autolayout"] = True
         self.view.figure.tight_layout()
+        #print(self.contentsMargins())
         
        
 
@@ -53,6 +55,8 @@ class PlotWidget(QWidget):
         self.axes.set_xlabel("")
         plt.rcParams.update({'font.size': 7})
         self.view.figure.tight_layout()
+        #self.view.figure.subplots_adjust(left=0, bottom=0, right=5, top=5, wspace=4, hspace=4)
+        #plt.subplots_adjust(left=0, bottom=0, right=1, top=1, wspace=0, hspace=0)
     
     def set_start(self, time):
         self.run_start = time

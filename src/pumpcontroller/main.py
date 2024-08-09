@@ -374,10 +374,19 @@ class PumpController(QMainWindow):
         self.ui.label_cond.setText(reading[1][0])
         self.ui.label_cond_units.setText(reading[1][1])
         if self.run_timer.isActive():
-            self.cond_run.append((datetime.strftime(reading[0],"%Y-%m-%d %H:%M:%S", reading[1][0])))
-            start = self.ui.widget_plot_cond.get_start()
-            interval = (reading[0] - start).total_seconds()/60
-            self.ui.widget_plot_cond.append_data(interval, float(reading[1][0]))
+            if self.ui.widget_plot_cond.get_start() is None:
+                #print("ADDING START POINT")
+                self.ui.widget_plot_cond.set_start(reading[0])
+                recordings = Protocol()
+                recordings.set_xvals([0])
+                recordings.set_yvals([float(self.ui.label_cond.text())])
+                self.ui.widget_plot_cond.on_change(recordings)
+            else:
+                start = self.ui.widget_plot_cond.get_start()
+                interval = (reading[0] - start).total_seconds()/60
+                self.ui.widget_plot_cond.append_data(interval, float(reading[1][0]))
+            self.cond_run.append((datetime.strftime(reading[0],"%Y-%m-%d %H:%M:%S"), reading[1][0]))
+            
         
     
 
@@ -394,18 +403,18 @@ class PumpController(QMainWindow):
         """ Begin recording the conductivity data to memory."""
         if self.run_timer.isActive():
             self.cond_run = []
-            self.cond_run.append((datetime.strftime(datetime.now()),"%Y-%m-%d %H:%M:%S", f"RUN {len(self.cond_runs)+1} IN {self.ui.label_cond_units.text()}"))
+            self.cond_run.append((datetime.strftime(datetime.now(),"%Y-%m-%d %H:%M:%S"), f"RUN {len(self.cond_runs)+1} IN {self.ui.label_cond_units.text()}"))
             self.write_to_console(f"{datetime.strftime(datetime.now(), FMT)} This is recorded run #{len(self.cond_runs)+1}")
             self.ui.widget_plot_cond.set_data(None)
             self.record_cond = True
-            self.ui.widget_plot_cond.set_start(datetime.now())
-            recordings = Protocol()
-            recordings.set_xvals([0])
-            recordings.set_yvals([float(self.ui.label_cond.text())])
-            self.ui.widget_plot_cond.on_change(recordings)
+            #self.ui.widget_plot_cond.set_start(datetime.now())
+            #recordings = Protocol()
+            #recordings.set_xvals([0])
+            #recordings.set_yvals([float(self.ui.label_cond.text())])
+            #self.ui.widget_plot_cond.on_change(recordings)
         
         
-    def stop_record_cond(self):
+    def stop_record_cond(self): 
         self.cond_runs.append(self.cond_run)
         self.cond_run = []
         self.record_cond = False
@@ -421,10 +430,14 @@ class PumpController(QMainWindow):
         #dialog.setFileMode(QFileDialog.Directory)
         #dialog.setAcceptMode(QFileDialog.AcceptSave)
         filename = QFileDialog.getSaveFileName(self, "Choose Save Location", f"./{datetime.strftime(datetime.now(), '%Y-%m-%d')}_COND.csv")[0]
-        #self.cond_runs = [
-        #    [(datetime.strftime(datetime.now(),"%Y-%m-%d-%H-%M-%S"), 0.00), ("TIME", 0.01), ("TIME2", 0.02), ("TIME3", 0.03)],
-        #    [("START2", 0.001), ("TIME5", 0.011), ("TIME6", 0.021), ("TIME7", 0.031)],
-        #    [("START3", 0.101), ("TIME5", 0.111), ("TIME6", 0.121), ("TIME7", 0.131)],]
+        max = 0
+        for run in self.cond_runs:
+            if len(run) > max:
+                max = len(run)
+                print(f"ADJUSTING MAX TO {max}")
+        for run in self.cond_runs:
+            if len(run) < max:
+                run+= [("", "")]*(max-len(run))
         try: 
             with open(filename, "w") as f:
                 splits = []
@@ -514,7 +527,7 @@ class PumpController(QMainWindow):
             self.stop_pump()
             self.run_timer.stop()
             self.ui.widget_plots.set_x(0)
-            #self.stop_record_cond()
+            self.stop_record_cond()
             self.write_to_console(f"#########################################################################################################")
             #self.ui.but_start_pump.setEnabled(True)
             #self.ui.but_start_protocol.setEnabled(True)

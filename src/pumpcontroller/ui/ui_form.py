@@ -28,7 +28,7 @@ class Ui_PumpController(object):
     def setupUi(self, PumpController):
         if not PumpController.objectName():
             PumpController.setObjectName(u"PumpController")
-        PumpController.resize(926, 698)
+        PumpController.resize(926, 804)
         self.actionQuit = QAction(PumpController)
         self.actionQuit.setObjectName(u"actionQuit")
         self.centralwidget = QWidget(PumpController)
