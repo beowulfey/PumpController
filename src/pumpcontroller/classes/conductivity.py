@@ -3,6 +3,8 @@ from datetime import datetime
 
 from PySide6.QtCore import QObject, Signal
 
+from pumpcontroller.classes.threads import Worker
+
 class Meter(QObject):
     #nesp_lib is too hardcore, i'm doing it my own way
     
@@ -14,9 +16,11 @@ class Meter(QObject):
         self.max_read = None
         self.min_conc = min_conc
         self.max_conc = max_conc
+        self.thread = None
         
         self.units = 'Units'
-        self._setup()
+        self.setup()
+
         super().__init__(parent)
         #self.units = self._get_measurement()[0][1]
         #print(self.units)
@@ -53,38 +57,73 @@ class Meter(QObject):
             self.units = units
             self.max_read = val
     
-    def _setup(self):
-        try:
-            # For some reason, I'd have to hardcode the read lengths. It works in a Python Interpreter (I can use .in_waiting to get length),
-            # but not here as a class for some reason. So I'm using readline instead, to be a bit safer. 
-            port = serial.Serial(self.port, 9600)
-            port.reset_input_buffer()
-            now = f'SETRTC {datetime.now().strftime("%Y-%m-%d-%H-%M-%S-3")}\r'.encode()
-            print("SETTING TIME TO: ",now)
-            port.write(now)
-            port.readline()
-            port.readline()
-            print("SERIAL CONDUCTIVITY METER INITIALIZED")
-            port.close()
-        except:
-            print("UNABLE TO CONNECT TO CONDUCTIVITY METER!")
+    def setup(self):
+        self.thread = Worker(self._setup)
+        self.thread.finished.connect(self.clear_thread)
+        self.thread.start()
+        
     
+    def read(self):
+        """ returns the current reading, converted if min and max are set """    
+        #print("READ!")    
+        self.thread = Worker(self._get_measurement)
+        self.thread.result.connect(self.return_read)
+        self.thread.finished.connect(self.clear_thread)
+        self.thread.start()
+        
+ 
+    def clear_thread(self):
+        #print("DELETE THREAD")
+        self.thread.deleteLater()
+        self.thread = None
+
+    
+    def return_read(self, result):
+        #print("RECEIVED RESULT")
+        self.measurement.emit(result)
+        
+
+    def _convert(self, reading):
+        # Interpolation formula:
+        # y = y1 + (x-x1) * ((y2-y1)/(x2-x1))
+        # ys are concentrations, xs are readings
+        converted = self.min_conc + (reading-self.min_read)*((self.max_conc-self.min_conc)/(self.max_read-self.min_read))
+        return converted    
+    
+    
+    # THREADED FUNCTIONS
+    def _setup(self):
+        # For some reason, I'd have to hardcode the read lengths. It works in a Python Interpreter (I can use .in_waiting to get length),
+        # but not here as a class for some reason. So I'm using readline instead, to be a bit safer. 
+
+        port = serial.Serial(self.port, 9600)
+        port.reset_input_buffer()
+        now = f'SETRTC {datetime.now().strftime("%Y-%m-%d-%H-%M-%S-3")}\r'.encode()
+        print("SETTING TIME TO: ",now)
+        port.write(now)
+        print(port.in_waiting)
+        print(port.readline())
+        print(port.readline())
+        #print("SERIAL CONDUCTIVITY METER INITIALIZED")
+        port.close()
+        return("SERIAL CONDUCTIVITY METER INITIALIZED")
+
     def _get_measurement(self):
         # Returns the time and a "Measurement"
         # Measurement is (value, units)
         #print("READING!")
-        if self.port is not None:
-            port = serial.Serial(self.port, 9600)
-            port.write(b'GETMEAS\r')
-            read = port.readline()
-            read = port.readline().decode()#(142).decode().split('\n')
-            port.close()
-            #(self.port.in_waiting).decode().split('\n')
-            #print("READ: ",read)
-            reply = [x.strip() for x in read.split(',')]
-            #print(reply)
-            time = datetime.strptime(reply[4]+" "+reply[5], '%m-%d-%Y %H:%M:%S')
-            meas = (reply[9], reply[10]) # value, units    
+        port = serial.Serial(self.port, 9600)
+        port.reset_input_buffer()
+        port.write(b'GETMEAS\r')
+        read = port.readline()
+        read = port.readline().decode()#(142).decode().split('\n')
+        port.close()
+        #(self.port.in_waiting).decode().split('\n')
+        #print("READ: ",read)
+        reply = [x.strip() for x in read.split(',')]
+        #print(reply)
+        time = datetime.strptime(reply[4]+" "+reply[5], '%m-%d-%Y %H:%M:%S')
+        meas = (reply[9], reply[10]) # value, units    
         if self.min_read != None and self.max_read != None: 
             converted = self._convert(float(meas[0]))
             #if converted >= 0:
@@ -96,15 +135,7 @@ class Meter(QObject):
  
         return (time, meas)
             
-               
-    def _convert(self, reading):
-        # Interpolation formula:
-        # y = y1 + (x-x1) * ((y2-y1)/(x2-x1))
-        # ys are concentrations, xs are readings
-        converted = self.min_conc + (reading-self.min_read)*((self.max_conc-self.min_conc)/(self.max_read-self.min_read))
-        return converted    
+
+
+
         
-    def read(self):
-        """ returns the current reading, converted if min and max are set """        
-        result = self._get_measurement()
-        self.measurement.emit(result)

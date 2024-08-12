@@ -6,7 +6,7 @@ import time
 import csv
 
 
-from PySide6.QtCore import Qt, QTimer, QThreadPool
+from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWidgets import QMainWindow, QHeaderView, QAbstractItemView, QFileDialog
 from PySide6.QtGui import QAction, QColor, QTextCursor, QColorConstants, QPalette
 
@@ -40,7 +40,6 @@ loader = QUiLoader()
 class PumpController(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.threadpool = QThreadPool()
         self.ui = Ui_PumpController()
         self.ui.setupUi(self)
         self.setWindowTitle('Pump Control')
@@ -393,8 +392,7 @@ class PumpController(QMainWindow):
     def cond_timer_tick(self):
         if self.meter.port != None:
             #print("CALLING METER")
-            worker = Worker(self.meter.read)
-            self.threadpool.start(worker)
+            self.meter.read()
         
             
     
