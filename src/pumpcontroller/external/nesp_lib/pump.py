@@ -320,11 +320,12 @@ class Pump :
         # This command converts a list of program steps into phases on the pump
         if prog != []:
             count = 0
+            offset = 0
             for n, phase in enumerate(prog):
                 # program offset. #1 is base run, #3 is beginning of programs. 
                 # add 1 to convert from index-0, add 1 to skip past the first phase (continuous run)
                 n = n + 1 + 1
-                offset = 0
+                
                 self.__command_transceive(Pump.__CommandName.PHASE, [n+offset])
                 
                 if phase["type"] == "RAT": 
@@ -339,7 +340,7 @@ class Pump :
                             self.__command_transceive(Pump.__CommandName.FUNC, [Pump.__CommandName.PAUSE.value, 99])
                             offset += 1
                             self.__command_transceive(Pump.__CommandName.PHASE, [n+offset])
-                            offset += 1
+                            #offset += 1
                             time = time - 99
                         self.__command_transceive(Pump.__CommandName.FUNC, [Pump.__CommandName.PAUSE.value, str(time).zfill(2)])
                     else:
@@ -357,7 +358,7 @@ class Pump :
                     self.__command_transceive(Pump.__CommandName.TIME, phase["amt"])
                     self.__command_transceive(Pump.__CommandName.PUMPING_DIRECTION, [Pump.__PumpingDirectionInfuse])
                 count = n + 1 + 1 + offset
-            self.__command_transceive(Pump.__CommandName.PHASE, [count+1])
+            self.__command_transceive(Pump.__CommandName.PHASE, [n+offset+1])
             self.__command_transceive(Pump.__CommandName.FUNC, [Pump.__CommandName.STOP.value])
         if wait_while_running :
             self.wait_while_running()

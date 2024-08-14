@@ -8,7 +8,7 @@ sys.path.append(os.path.dirname(__file__) + "/..")
 from pumpcontroller.main import PumpController
 
 
-__VERSION__ = "1.3.0"
+__VERSION__ = "1.5.2"
 
 def app():
     #QApplication.setStyle("fusion")

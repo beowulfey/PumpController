@@ -53,7 +53,7 @@ class PumpController(QMainWindow):
         self.ui.spin_pbc.setValue(100)
         self.ui.but_confirm_settings.setMinimumWidth(93)
         
-        print(self.ui.but_confirm_settings.palette().color(QPalette.ButtonText))
+        #print(self.ui.but_confirm_settings.palette().color(QPalette.ButtonText))
         
         
         self.pumps = None
@@ -370,29 +370,36 @@ class PumpController(QMainWindow):
         
     def receive_reading(self, reading):
         #print("SIGNAL RECEIVED")
-        self.ui.label_cond.setText(reading[1][0])
-        self.ui.label_cond_units.setText(reading[1][1])
+        if float(reading[1][0]) >= 1000:
+            meas = str(float(reading[1][0])/1000)
+            units = "mS/cm"
+        else:
+            meas = reading[1][0]
+            units = reading[1][1]
+        self.ui.label_cond.setText(meas)
+        self.ui.label_cond_units.setText(units)
         if self.run_timer.isActive():
             if self.ui.widget_plot_cond.get_start() is None:
                 #print("ADDING START POINT")
                 self.ui.widget_plot_cond.set_start(reading[0])
                 recordings = Protocol()
                 recordings.set_xvals([0])
-                recordings.set_yvals([float(self.ui.label_cond.text())])
+                recordings.set_yvals([float(meas)])
                 self.ui.widget_plot_cond.on_change(recordings)
             else:
                 start = self.ui.widget_plot_cond.get_start()
                 interval = (reading[0] - start).total_seconds()/60
-                self.ui.widget_plot_cond.append_data(interval, float(reading[1][0]))
-            self.cond_run.append((datetime.strftime(reading[0],"%Y-%m-%d %H:%M:%S"), reading[1][0]))
+                self.ui.widget_plot_cond.append_data(interval, float(meas))
+            self.cond_run.append((datetime.strftime(reading[0],"%Y-%m-%d %H:%M:%S"), float(meas)))
             
         
     
 
     def cond_timer_tick(self):
         if self.meter.port != None:
+            if self.run_timer.isActive():
             #print("CALLING METER")
-            self.meter.read()
+                self.meter.read()
         
             
     

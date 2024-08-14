@@ -58,24 +58,27 @@ class Meter(QObject):
             self.max_read = val
     
     def setup(self):
-        self.thread = Worker(self._setup)
-        self.thread.finished.connect(self.clear_thread)
-        self.thread.start()
-        
+        #self.thread = Worker(self._setup)
+        #self.thread.finished.connect(self.clear_thread)
+        #self.thread.start()
+        self._setup()
     
     def read(self):
         """ returns the current reading, converted if min and max are set """    
         #print("READ!")    
-        self.thread = Worker(self._get_measurement)
-        self.thread.result.connect(self.return_read)
-        self.thread.finished.connect(self.clear_thread)
-        self.thread.start()
+        result = self._get_measurement()
+        self.measurement.emit(result)
+        #self.thread = Worker(self._get_measurement)
+        #self.thread.result.connect(self.return_read)
+        #self.thread.finished.connect(self.clear_thread)
+        #self.thread.start()
         
  
     def clear_thread(self):
         #print("DELETE THREAD")
+        #self.thread.quit()
         self.thread.deleteLater()
-        self.thread = None
+        #self.thread = None
 
     
     def return_read(self, result):
@@ -106,6 +109,7 @@ class Meter(QObject):
         print(port.readline())
         #print("SERIAL CONDUCTIVITY METER INITIALIZED")
         port.close()
+        del port
         return("SERIAL CONDUCTIVITY METER INITIALIZED")
 
     def _get_measurement(self):
@@ -118,6 +122,7 @@ class Meter(QObject):
         read = port.readline()
         read = port.readline().decode()#(142).decode().split('\n')
         port.close()
+        del port
         #(self.port.in_waiting).decode().split('\n')
         #print("READ: ",read)
         reply = [x.strip() for x in read.split(',')]
