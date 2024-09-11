@@ -309,10 +309,11 @@ class PumpController(QMainWindow):
         
         if self.port:
             for _n, _pump in enumerate(self.pumps):
+                if _pump.running == False:
                 #_pump.send_run(phases[_n])
-                if rates[_n] > 0:
-                    _pump.send_run()
-                    _pump.pumping_rate = float(rates[_n])
+                    if rates[_n] > 0:
+                        _pump.send_run()
+                        _pump.pumping_rate = float(rates[_n])
         #self.ui.but_start_pump.setEnabled(True)
         #self.ui.but_update_pump.setDisabled(True)
     
@@ -325,9 +326,11 @@ class PumpController(QMainWindow):
             for _n, _pump in enumerate(self.pumps):
                 if _pump.running:
                         _pump.stop()
+            self.update_pump(rates=concs)
+            for _n, _pump in enumerate(self.pumps):
                 if concs[_n] > 0:
-                        _pump.send_run()
-                        _pump.pumping_rate = float(concs[_n])
+                        #_pump.send_run()
+                        #_pump.pumping_rate = float(concs[_n])
                         _pump.run(wait_while_running=False)
         #self.ui.but_stop_pump.setEnabled(True)
         #self.ui.but_start_pump.setDisabled(True)
@@ -571,10 +574,13 @@ class PumpController(QMainWindow):
         #self.ui.but_stop_protocol.setDisabled(True)
         
     def update_protocol(self):
-        self.write_to_console(f"{datetime.strftime(datetime.now(), FMT)} SENT PROTOCOL TO PUMP")
+        self.write_to_console(f"{datetime.strftime(datetime.now(), FMT)} SENDING PROTOCOL TO PUMPS")
         if self.port:
             for n, pump in enumerate(self.pumps):
-                pump.send_program(self.phases[n])
+                if pump.running == False:
+                    pump.send_program(self.phases[n])
+                else:
+                    self.write_to_console(f"{datetime.strftime(datetime.now(), FMT)} PUMP IS RUNNING -- PUMP PROTOCOL NOT UPDATED!! STOP PUMPS AND CLICK UPDATE AGAIN!")
                 
     def update_pump_program(self):
         # converts the segments into phase format for the pumps
@@ -645,7 +651,10 @@ class PumpController(QMainWindow):
             
         if self.port:
             for n, pump in enumerate(self.pumps):
-                pump.send_program(self.phases[n])
+                if pump.running == False:
+                    pump.send_program(self.phases[n])
+                else:
+                    self.write_to_console(f"{datetime.strftime(datetime.now(), FMT)} PUMP IS RUNNING -- PUMP PROTOCOL NOT UPDATED!! STOP PUMPS AND CLICK UPDATE AGAIN!")
 
                 
                 

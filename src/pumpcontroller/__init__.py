@@ -2,13 +2,13 @@ import sys, os
 
 from PySide6.QtWidgets import QApplication
 import qdarktheme
-
+import importlib.metadata
 sys.path.append(os.path.dirname(__file__) + "/..")
 
 from pumpcontroller.main import PumpController
 
 
-__VERSION__ = "1.5.2"
+__VERSION__ = importlib.metadata.version('PumpController')
 
 def app():
     #QApplication.setStyle("fusion")
