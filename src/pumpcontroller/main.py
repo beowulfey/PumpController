@@ -306,7 +306,7 @@ class PumpController(QMainWindow):
     def update_pump(self, rates=None):
         if not rates:
             rates = self.calculate_flowrates(self.ui.spin_straight_conc.value())
-        self.write_to_console(f"{datetime.strftime(datetime.now(), FMT)} Pump flow rates are now at {rates} (ml/min)")
+        self.write_to_console(f"{datetime.strftime(datetime.now(), FMT)} Pump flow rates are now at {rates} (ul/min)")
         
         if self.port:
             for _n, _pump in enumerate(self.pumps):
