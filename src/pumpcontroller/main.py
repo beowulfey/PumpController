@@ -253,10 +253,11 @@ class PumpController(QMainWindow):
                 self.meter.measurement.connect(self.receive_reading)
             else:
                 raise UserWarning("Incorrect COM port -- appears blank!")
+                print("WHOOPS")
             
         except:
             self.meter = Meter()
-            self.meter.measurement.connect(self.receive_reading)
+            #self.meter.measurement.connect(self.receive_reading)
             self.write_to_console(f"{datetime.strftime(datetime.now(), FMT)} @@@@@ Unable to connect to CONDUCTIVITY METER! Check your COM ports!! @@@@@", RED)
         else:
             self.write_to_console(f"{datetime.strftime(datetime.now(), FMT)} @@@@@ METER CONNECTED AT COM PORT {self.cond_com_port} @@@@@", GREEN)
@@ -669,8 +670,8 @@ class PumpController(QMainWindow):
         # Flow rates are basically a proportion based on total flow and concs
         b_rate = ((conc - pac) / (pbc - pac)) * flow
         a_rate = flow - b_rate
-        # returns the flow rates rounded to three decimal places.
-        return [round(abs(a_rate), 3), round(abs(b_rate), 3)]
+        # returns the flow rates rounded to three decimal places and converted to microliters
+        return [round(abs(a_rate), 3)*1000, round(abs(b_rate), 3)*1000]
 
     ## GETTERS AND SETTERS
 

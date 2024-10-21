@@ -87,9 +87,9 @@ class Pump :
         self.__firmware_upgrade = firmware_upgrade_port
         
         # There is no command to just set units, so we want to save this data in pythonland
-        # I've set it to ml/min by default
+        # I've set it to ul/min by default
         # This is not at all how the original author set up this software but OH WELL
-        self.__units = "MM" 
+        self.__units = "UM" 
 
     @property
     def address(self) -> int :
@@ -218,53 +218,54 @@ class Pump :
 
     @property
     def pumping_volume(self) -> float :
-        """Gets the pumping volume of the pump in units of milliliters."""
+        """Gets the pumping volume of the pump in units of microliters."""
         _, match = self.__command_transceive(
             Pump.__CommandName.PUMPING_VOLUME, [], Pump.__RE_PATTERN_PUMPING_VOLUME
         )
         value = float(match[1])
         units = match[2]
-        value_milliliters = Pump.__VOLUME_MILLILITERS.get(units)
-        if value_milliliters is None :
+        value_microliters = Pump.__VOLUME_MICROLITERS.get(units)
+        if value_microliters is None :
             raise InternalException()
-        return value_milliliters(value)
+        return value_microliters(value)
 
     @pumping_volume.setter
     # NEED TO UPDATE THIS
     def pumping_volume(self, pumping_volume : float) -> None :
         """
-        Sets the pumping volume of the pump in units of milliliters.
+        Sets the pumping volume of the pump in units of microliters.
 
         Note: The value is truncated to the 4 most significant digits.
 
         :raises ValueError:
             Pumping volume invalid.
         """
-        if pumping_volume < 0.001 / 1_000.0 or pumping_volume >= 10_000.0 :
-            raise ValueError('Pumping volume invalid: Value exceeds limit.')
-        if pumping_volume >= 10_000.0 / 1_000.0 :
-            units = 'ML'
-        else :
-            pumping_volume *= 1_000.0
-            units = 'UL'
-        self.__command_transceive(Pump.__CommandName.PUMPING_VOLUME, [units])
+        
+        #if pumping_volume < 0.001 / 1_000.0 or pumping_volume >= 10_000.0 :
+        #    raise ValueError('Pumping volume invalid: Value exceeds limit.')
+        #if pumping_volume >= 10_000.0 / 1_000.0 :
+        #    units = 'ML'
+        #else :
+        #    pumping_volume *= 1_000.0
+        #    units = 'UL'
+        self.__command_transceive(Pump.__CommandName.PUMPING_VOLUME, [self.__units])
         try :
             self.__command_transceive(Pump.__CommandName.PUMPING_VOLUME, [pumping_volume])
         except ValueError :
-            raise ValueError('Pumping volume invalid: Value exceeds limit.')
+            raise ValueError('Pumping volume invalid WHOOPS.')
 
     @property
     def pumping_rate(self) -> float :
-        """Gets the pumping rate of the pump in units of milliliters per minute."""
+        """Gets the pumping rate of the pump in units of microliters per minute."""
         _, match = self.__command_transceive(
             Pump.__CommandName.PUMPING_RATE, [], Pump.__RE_PATTERN_PUMPING_RATE
         )
         value = float(match[1])
         units = match[2]
-        value_milliliters_per_minute = Pump.__PUMPING_RATE_MILLILITERS_PER_MINUTE.get(units)
-        if value_milliliters_per_minute is None :
+        value_microliters_per_minute = Pump.__PUMPING_RATE_MICROLITERS_PER_MINUTE.get(units)
+        if value_microliters_per_minute is None :
             raise InternalException()
-        return value_milliliters_per_minute(value)
+        return value_microliters_per_minute(value)
 
     @pumping_rate.setter
     def pumping_rate(self, pumping_rate : float) -> None :
@@ -483,6 +484,21 @@ class Pump :
         # Microliters per hour.
         'UH' : lambda value : value / 60_000.0,
     }
+    
+    __PUMPING_RATE_MICROLITERS_PER_MINUTE = {
+        # Milliliters per minute.
+        'MM' : lambda value : value * 1_000.0,
+        # Milliliters per hour.
+        'MH' : lambda value : value * 60_000.0,
+        # Microliters per minute.
+        'UM' : lambda value : value,
+        # Microliters per hour.
+        'UH' : lambda value : value / 60.0,
+        # Nanoliters per minute.
+        'NM' : lambda value : value / 1_000.0,
+        # Nanoliters per hour.
+        'NH' : lambda value: value / 60_000.0,
+    }
 
     __VOLUME_MILLILITERS = {
         # Milliliters.
@@ -491,11 +507,29 @@ class Pump :
         'UL' : lambda value : value / 1_000.0,
     }
 
+    __VOLUME_MICROLITERS = {
+        # Milliliters.
+        'ML' : lambda value : value * 1_000.0,
+        # Microliters.
+        'UL' : lambda value : value,
+        # Nanoliters.
+        'NL' : lambda value : value / 1_000.0,
+    }
+
     __VOLUME_MILLILITERS_SET = {
         # Milliliters.
         'ML' : lambda value : value,
         # Microliters.
         'UL' : lambda value : value * 1_000.0,
+    }
+    
+    __VOLUME_MICROLITERS_SET = {
+        # Milliliters.
+        'ML' : lambda value : value * 1_000.0,
+        # Microliters.
+        'UL' : lambda value : value,
+        # Nanoliters.
+        'NH' : lambda value : value / 1_000.0,
     }
 
     def __error_handle_not_applicable() -> None :

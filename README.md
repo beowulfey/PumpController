@@ -36,7 +36,12 @@ I haven't really made this user friendly yet -- still need to update setup.py an
 This will create an .EXE in dist/PumpController. You can create a shortcut to this on the desktop or somewhere else. 
 
 
+#########################
 
-
+To do: 
+- Clean up the code to make it more friendly
+- Try to get the meter into a separate thread
+- Add support for precise pumps (NE-1002X): change everything into uL/min
+- Rewrite NESPlib to make it simpler? 
 
 
