@@ -448,7 +448,7 @@ class PumpController(QMainWindow):
             if len(run) < max:
                 run+= [("", "")]*(max-len(run))
         try: 
-            with open(filename, "w") as f:
+            with open(filename, "w", newline='', encoding='utf-8') as f:
                 splits = []
                 for run in self.cond_runs:
                     splits += list(zip(*run))
